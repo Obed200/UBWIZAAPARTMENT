@@ -1,0 +1,268 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Our Rooms</h1>
+        <p class="lead">Find the perfect room for your stay in Kanombe</p>
+    </div>
+
+    <!-- Room Filters -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Room Type</label>
+                    <select class="form-select" id="roomTypeFilter">
+                        <option value="all">All Types</option>
+                        <option value="single">Single Room</option>
+                        <option value="double">Double Room</option>
+                        <option value="suite">Suite</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Price Range</label>
+                    <select class="form-select" id="priceFilter">
+                        <option value="all">All Prices</option>
+                        <option value="budget">Under 50,000 RWF</option>
+                        <option value="medium">50,000 - 100,000 RWF</option>
+                        <option value="premium">Over 100,000 RWF</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Sort By</label>
+                    <select class="form-select" id="sortFilter">
+                        <option value="featured">Featured First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Name: A to Z</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-outline-secondary w-100" id="resetFilters">
+                        <i class="fas fa-redo me-2"></i>Reset Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rooms Grid -->
+    <div class="row" id="roomsGrid">
+        {% for room in rooms %}
+        <div class="col-xl-4 col-lg-6 mb-4 room-item" 
+             data-type="{{ room.room_type }}" 
+             data-price="{{ room.price }}"
+             data-featured="{{ room.is_featured|yesno:'true,false' }}"
+             data-name="{{ room.title|lower }}">
+            <div class="card room-card h-100 shadow-sm">
+                {% if room.is_featured %}
+                <div class="position-absolute top-0 start-0 m-2">
+                    <span class="badge bg-warning">
+                        <i class="fas fa-star me-1"></i>Featured
+                    </span>
+                </div>
+                {% endif %}
+                <img src="{{ room.image.url }}" class="card-img-top room-image" 
+                     alt="{{ room.title }}" style="height: 250px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ room.title }}</h5>
+                    <div class="mb-2">
+                        <span class="badge bg-{% if room.room_type == 'single' %}info{% elif room.room_type == 'double' %}success{% else %}warning{% endif %}">
+                            {{ room.room_type|title }} Room
+                        </span>
+                    </div>
+                    <p class="card-text flex-grow-1">{{ room.description }}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="h5 text-success mb-0">{{ room.price }} RWF/month</span>
+                            <small class="text-muted">+ taxes</small>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'booking' %}?room={{ room.id }}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-calendar-check me-2"></i>Book Now
+                            </a>
+                            <button class="btn btn-outline-secondary btn-sm room-details" 
+                                    data-room-id="{{ room.id }}">
+                                <i class="fas fa-info-circle me-2"></i>View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-warning">
+                <i class="fas fa-bed fa-2x mb-3"></i>
+                <h4>No Rooms Available</h4>
+                <p>Please check back later for available rooms.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Room Counter -->
+    <div class="text-center mt-4">
+        <p class="text-muted">
+            Showing <span id="roomCount">{{ rooms|length }}</span> of {{ rooms|length }} rooms
+        </p>
+    </div>
+</div>
+
+<!-- Room Details Modal -->
+<div class="modal fade" id="roomModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roomModalTitle">Room Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="roomModalBody">
+                <!-- Room details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'booking' %}" class="btn btn-primary">
+                    <i class="fas fa-calendar-check me-2"></i>Book This Room
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.room-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.room-image {
+    transition: transform 0.3s ease;
+}
+
+.room-card:hover .room-image {
+    transform: scale(1.05);
+}
+
+.badge {
+    font-size: 0.8rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roomItems = document.querySelectorAll('.room-item');
+    const roomCount = document.getElementById('roomCount');
+    
+    // Filter functionality
+    function filterRooms() {
+        const typeFilter = document.getElementById('roomTypeFilter').value;
+        const priceFilter = document.getElementById('priceFilter').value;
+        const sortFilter = document.getElementById('sortFilter').value;
+        
+        let visibleCount = 0;
+        const roomsArray = Array.from(roomItems);
+        
+        // Filter rooms
+        roomsArray.forEach(room => {
+            const roomType = room.getAttribute('data-type');
+            const roomPrice = parseInt(room.getAttribute('data-price'));
+            let visible = true;
+            
+            // Type filter
+            if (typeFilter !== 'all' && roomType !== typeFilter) {
+                visible = false;
+            }
+            
+            // Price filter
+            if (priceFilter !== 'all') {
+                if (priceFilter === 'budget' && roomPrice >= 50000) visible = false;
+                if (priceFilter === 'medium' && (roomPrice < 50000 || roomPrice > 100000)) visible = false;
+                if (priceFilter === 'premium' && roomPrice <= 100000) visible = false;
+            }
+            
+            room.style.display = visible ? 'block' : 'none';
+            if (visible) visibleCount++;
+        });
+        
+        // Sort rooms
+        const visibleRooms = roomsArray.filter(room => room.style.display !== 'none');
+        
+        visibleRooms.sort((a, b) => {
+            const aFeatured = a.getAttribute('data-featured') === 'true';
+            const bFeatured = b.getAttribute('data-featured') === 'true';
+            const aPrice = parseInt(a.getAttribute('data-price'));
+            const bPrice = parseInt(b.getAttribute('data-price'));
+            const aName = a.getAttribute('data-name');
+            const bName = b.getAttribute('data-name');
+            
+            switch(sortFilter) {
+                case 'featured':
+                    if (aFeatured && !bFeatured) return -1;
+                    if (!aFeatured && bFeatured) return 1;
+                    return 0;
+                case 'price-low':
+                    return aPrice - bPrice;
+                case 'price-high':
+                    return bPrice - aPrice;
+                case 'name':
+                    return aName.localeCompare(bName);
+                default:
+                    return 0;
+            }
+        });
+        
+        // Reorder DOM
+        const roomsGrid = document.getElementById('roomsGrid');
+        visibleRooms.forEach(room => roomsGrid.appendChild(room));
+        
+        // Update counter
+        roomCount.textContent = visibleCount;
+    }
+    
+    // Event listeners for filters
+    document.getElementById('roomTypeFilter').addEventListener('change', filterRooms);
+    document.getElementById('priceFilter').addEventListener('change', filterRooms);
+    document.getElementById('sortFilter').addEventListener('change', filterRooms);
+    document.getElementById('resetFilters').addEventListener('click', function() {
+        document.getElementById('roomTypeFilter').value = 'all';
+        document.getElementById('priceFilter').value = 'all';
+        document.getElementById('sortFilter').value = 'featured';
+        filterRooms();
+    });
+    
+    // Room details modal
+    const roomModal = new bootstrap.Modal(document.getElementById('roomModal'));
+    const roomModalTitle = document.getElementById('roomModalTitle');
+    const roomModalBody = document.getElementById('roomModalBody');
+    
+    document.querySelectorAll('.room-details').forEach(button => {
+        button.addEventListener('click', function() {
+            const roomId = this.getAttribute('data-room-id');
+            // In a real application, you'd fetch room details via AJAX
+            // For now, we'll show a simple message
+            roomModalTitle.textContent = 'Room Details';
+            roomModalBody.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-info-circle fa-3x text-primary mb-3"></i>
+                    <h4>Detailed Room Information</h4>
+                    <p>Full room details, amenities, and more information would be displayed here.</p>
+                    <p>Room ID: ${roomId}</p>
+                </div>
+            `;
+            roomModal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

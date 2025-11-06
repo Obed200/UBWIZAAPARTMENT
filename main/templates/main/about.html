@@ -1,0 +1,206 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero bg-dark text-white py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">About UBWIZA APARTMENT</h1>
+                <p class="lead">Your Home Away From Home in the Heart of Kanombe</p>
+            </div>
+            <div class="col-lg-6">
+                {% if gallery_images %}
+                    <img src="{{ gallery_images.0.image.url }}" alt="UBWIZA Apartment" class="img-fluid rounded shadow">
+                {% else %}
+                    <div class="bg-secondary rounded shadow d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <span class="text-white">No image available</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Vision -->
+<section class="mission-vision py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-md-6">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body p-4 text-center">
+                        <i class="fas fa-bullseye fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title h4">Our Mission</h3>
+                        <p class="card-text">
+                            To provide exceptional accommodation experiences by offering comfortable, 
+                            affordable, and well-equipped apartment that feel like home. We strive 
+                            to make every guest's stay memorable through personalized service and 
+                            attention to detail.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body p-4 text-center">
+                        <i class="fas fa-eye fa-3x text-success mb-3"></i>
+                        <h3 class="card-title h4">Our Vision</h3>
+                        <p class="card-text">
+                            To become the preferred choice for travelers seeking quality accommodation 
+                            in Kanombe, known for our reliability, comfort, and exceptional customer 
+                            service that exceeds expectations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="why-choose-us bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose UBWIZA Apartment?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                    <h4>Prime Location</h4>
+                    <p>Strategically located in Kanombe with easy access to Kigali International Airport and city attractions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-home fa-2x text-success mb-3"></i>
+                    <h4>Comfortable Spaces</h4>
+                    <p>Spacious, well-furnished apartment designed for both short and long-term stays.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-wifi fa-2x text-info mb-3"></i>
+                    <h4>Modern Amenities</h4>
+                    <p>High-speed WiFi, fully equipped kitchens, and all essential amenities for a comfortable stay.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-shield-alt fa-2x text-warning mb-3"></i>
+                    <h4>Safe & Secure</h4>
+                    <p>24/7 security and surveillance to ensure your peace of mind throughout your stay.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-concierge-bell fa-2x text-danger mb-3"></i>
+                    <h4>Friendly Staff</h4>
+                    <p>Our dedicated team is always ready to assist you with any needs or requests.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-tag fa-2x text-secondary mb-3"></i>
+                    <h4>Best Value</h4>
+                    <p>Competitive pricing without compromising on quality and comfort.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Story -->
+<section class="our-story py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="mb-4">Our Story</h2>
+                <p class="mb-4">
+                    Founded with a passion for hospitality, UBWIZA Apartment emerged from the need 
+                    for quality, affordable accommodation in the growing Kanombe area. Our name 
+                    "UBWIZA" means "beauty" in Kinyarwanda, reflecting our commitment to creating 
+                    beautiful experiences for our guests.
+                </p>
+                <p class="mb-4">
+                    We understand that traveling can be stressful, which is why we've created 
+                    spaces that offer the comfort and convenience of home combined with the 
+                    professionalism of hotel services.
+                </p>
+                <div class="d-flex gap-3">
+                    <div class="text-center">
+                        <h3 class="text-primary mb-0">50+</h3>
+                        <small>Happy Guests</small>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-success mb-0">5⭐</h3>
+                        <small>Customer Rating</small>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-info mb-0">2+</h3>
+                        <small>Years Experience</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                {% if gallery_images %}
+                <div class="row g-3">
+                    {% for image in gallery_images|slice:":4" %}
+                    <div class="col-6">
+                        <img src="{{ image.image.url }}" alt="{{ image.title }}" class="img-fluid rounded shadow" style="height: 150px; width: 100%; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted">
+                    <p>No gallery images available yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-3">Ready to Experience UBWIZA?</h2>
+        <p class="lead mb-4">Book your stay today and discover why our guests keep coming back</p>
+        <a href="{% url 'booking' %}" class="btn btn-light btn-lg px-5">Book Now</a>
+    </div>
+</section>
+
+<style>
+.about-hero {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    border-radius: 0 0 50px 50px;
+}
+
+.mission-vision .card {
+    transition: transform 0.3s ease;
+}
+
+.mission-vision .card:hover {
+    transform: translateY(-5px);
+}
+
+.why-choose-us i {
+    transition: transform 0.3s ease;
+}
+
+.why-choose-us .col-md-4:hover i {
+    transform: scale(1.2);
+}
+
+.our-story img {
+    transition: transform 0.3s ease;
+}
+
+.our-story img:hover {
+    transform: scale(1.05);
+}
+
+.cta {
+    border-radius: 50px 50px 0 0;
+}
+</style>
+{% endblock %}

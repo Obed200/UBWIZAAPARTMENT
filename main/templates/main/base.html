@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UBWIZA APARTMENT</title>
+
+    <!-- Font Awesome -->   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  integrity="sha512-TD9QzZsJzvRByB+r7dJYkKPeC2KfDqXGrQjKbdk+6U8d9e0Vw4EZ7e9kWnh4JqJ5xKwF6fVD2X03xZlIoG7yYg=="crossorigin="anonymous"referrerpolicy="no-referrer"/>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+
+    <style>
+        .hero {
+            position: relative;
+            height: 80vh;
+            overflow: hidden;
+        }
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+        }
+        .room-cards, .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card img {
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .gallery-grid img {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+        }
+        footer {
+            background: #343a40;
+            color: white;
+            padding: 40px 0;
+        }
+        footer a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+        <div class="rounded-circle overflow-hidden me-3" style="width: 45px; height: 45px;">
+          <img src="{% static 'images/logo.png' %}" alt="UBWIZA APARTMENT" class="w-100 h-100" style="object-fit: cover;">
+        </div>
+        <div>
+          <span class="fw-bold fs-5" style="color: #ffd700;">UBWIZA</span>
+          <span class="fs-5"> APARTMENT</span>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'rooms' %}">Rooms</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'gallery' %}">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'booking' %}">Booking</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+</nav>
+<!-- Main Content -->
+<main class="container my-5">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>UBWIZA APARTMENT</h5>
+                <p>Comfortable stays in the heart of Kanombe.</p>
+                <p class="mb-0">Address: Kanombe, Kigali, Rwanda</p>
+                <br>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d962.2567024364116!2d30.175209911472646!3d-1.9936578227329573!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMcKwNTknMzUuNiJTIDMwwrAxMCczNS45IkU!5e1!3m2!1sen!2srw!4v1760291264715!5m2!1sen!2srw" width="200" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'home' %}" class="text-white">Home</a></li>
+                    <li><a href="{% url 'rooms' %}" class="text-white">Rooms</a></li>
+                    <li><a href="{% url 'gallery' %}" class="text-white">Gallery</a></li>
+                    <li><a href="{% url 'about' %}" class="text-white">About</a></li>
+                    <li><a href="{% url 'booking' %}" class="text-white">Booking</a></li>
+                    <li><a href="{% url 'contact' %}" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <br>
+                <a href="mailto:{{ site_settings.contact_email|default:"tuyambazesylvain5@gmail.com" }}" class="text-decoration-none text-white" target="_blank"><i class="fas fa-envelope"></i> {{ site_settings.contact_email|default:"tuyambazesylvain5@gmail.com" }}</a>
+            
+                <br>
+                <a href="tel:+250791010558" class="text-decoration-none text-white" target="_blank"><i class="fas fa-phone"></i> +250 791 010 558</a>
+                <br>
+                <a href="tel:+16785324896" class="text-decoration-none text-white" target="_blank"><i class="fas fa-phone"></i> +1 6785 324 896</a>
+                <br>
+                <a href="https://wa.me/16785324896" class="text-decoration-none text-white" target="_blank"><i class="fab fa-whatsapp"></i> +1 6785 324 896</a>
+                
+                          
+                <br>
+                <a href="https://wa.me/250791010558" class="text-decoration-none text-white" target="_blank"><i class="fab fa-whatsapp"></i> +250 791 010 558</a>
+                
+                <br>
+                <br>
+                
+                <h5>Our Social Media</h5>
+
+                <div class="social-links d-flex justify-content-center mt-3">
+                    <a href="https://web.facebook.com/profile.php?id=61554851241097" class="me-3" style="color: #1877F2;" target="_blank"><i class="fab fa-facebook fa-xl"></i></a>  <!-- Facebook -->
+                    <a href="https://x.com/TuyambazeS79520" class="me-3" style="color: #000000;" target="_blank"><i class="fa-brands fa-x-twitter fa-xl"></i></a> <!-- X (formerly Twitter) -->
+                    <a href="https://www.instagram.com/ubwizaapartment/" class="me-3" style="color: #E4405F;" target="_blank"><i class="fab fa-instagram fa-xl"></i></a> <!-- Instagram -->
+                    <a href="https://www.tiktok.com/@tuyambazesylvain" class="me-3" style="color: #010101;" target="_blank"><i class="fab fa-tiktok fa-xl"></i></a>    <!-- TikTok -->
+                    <a href="https://www.youtube.com/channel/UCqA2x9hGqTNn-ywpSQRAPlQ" class="me-3" style="color: #FF0000;" target="_blank"><i class="fab fa-youtube fa-xl"></i></a>   <!-- YouTube -->
+                  </div>
+                  
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            &copy; {{ now|date:"Y" }} UBWIZA APARTMENT. Designed by <a href="https://scintillating-torte-cdd5ec.netlify.app/" target="_blank" class="text-white"><small style="font-size: 12px; font-weight: bold; color:lightblue;">IT Obed</small></a>.
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

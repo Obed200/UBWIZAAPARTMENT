@@ -1,0 +1,371 @@
+{% extends "main/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Page Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-primary">Book Your Stay</h1>
+                <p class="lead">Experience comfort and luxury at UBWIZA Apartment</p>
+            </div>
+
+            <div class="row">
+                <!-- Booking Form -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-primary text-white py-4">
+                            <h3 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Booking Details</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <form method="post" class="needs-validation" novalidate>
+                                {% csrf_token %}
+                                
+                                <!-- Room Selection with Preview -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold h5">
+                                        <i class="fas fa-bed me-2 text-primary"></i>Select Your Room
+                                    </label>
+                                    <div class="row" id="roomOptions">
+                                        {% for room in rooms %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card room-option {% if forloop.first %}border-primary{% endif %}" 
+                                                 data-room-id="{{ room.id }}" 
+                                                 data-room-price="{{ room.price }}"
+                                                 style="cursor: pointer; transition: all 0.3s;">
+                                                <div class="card-body">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" 
+                                                               name="room" id="room{{ room.id }}" 
+                                                               value="{{ room.id }}" {% if forloop.first %}checked{% endif %}>
+                                                        <label class="form-check-label fw-bold" for="room{{ room.id }}">
+                                                            {{ room.title }}
+                                                        </label>
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-{% if room.room_type == 'single' %}info{% elif room.room_type == 'double' %}warning{% else %}success{% endif %}">
+                                                            {{ room.room_type|title }}
+                                                        </span>
+                                                        <span class="fw-bold text-success ms-2">{{ room.price }} RWF/month</span>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-1">{{ room.description|truncatewords:10 }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <!-- Dates Section -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="check_in" class="form-label fw-bold">
+                                            <i class="fas fa-sign-in-alt me-2 text-success"></i>Check-in Date
+                                        </label>
+                                        <input type="date" class="form-control" id="check_in" name="check_in" 
+                                               min="{{ today }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="check_out" class="form-label fw-bold">
+                                            <i class="fas fa-sign-out-alt me-2 text-danger"></i>Check-out Date
+                                        </label>
+                                        <input type="date" class="form-control" id="check_out" name="check_out" 
+                                               min="{{ tomorrow }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="guests" class="form-label fw-bold">
+                                            <i class="fas fa-users me-2 text-primary"></i>Number of Guests
+                                        </label>
+                                        <select class="form-select" id="guests" name="guests" required>
+                                            <option value="1">1 Guest</option>
+                                            <option value="2" selected>2 Guests</option>
+                                            <option value="3">3 Guests</option>
+                                            <option value="4">4 Guests</option>
+                                            <option value="5">5+ Guests</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-clock me-2 text-info"></i>Total Stay
+                                        </label>
+                                        <div class="form-control bg-light">
+                                            <span id="totalNights">0 nights</span>
+                                            <span class="text-muted"> • </span>
+                                            <span id="totalCost">0 RWF</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Personal Information -->
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2 mb-3">
+                                        <i class="fas fa-user-circle me-2 text-primary"></i>Personal Information
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="name" class="form-label fw-bold">Full Name</label>
+                                            <input type="text" class="form-control" id="name" name="name" 
+                                                   placeholder="Enter your full name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email" class="form-label fw-bold">Email Address</label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   placeholder="your@email.com" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label fw-bold">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" 
+                                               placeholder="+250 XXX XXX XXX" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="special_requests" class="form-label fw-bold">Special Requests</label>
+                                        <textarea class="form-control" id="special_requests" name="special_requests" 
+                                                  rows="3" placeholder="Any special requirements or requests..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                                        <i class="fas fa-lock me-2"></i>Confirm Booking
+                                    </button>
+                                    <p class="text-muted mt-2 small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        You'll receive a confirmation email within minutes
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Summary & Features -->
+                <div class="col-lg-4">
+                    <!-- Price Summary -->
+                    <div class="card shadow border-0 mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Booking Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Room price per month:</span>
+                                <span id="summaryPrice">0 RWF</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Duration:</span>
+                                <span id="summaryNights">0 months</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total:</span>
+                                <span id="summaryTotal" class="text-success">0 RWF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Why Book With Us -->
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-star me-2"></i>Why Book With Us?</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex mb-3">
+                                <i class="fas fa-wifi text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Free WiFi</h6>
+                                    <small class="text-muted">High-speed internet included</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <i class="fas fa-shield-alt text-success me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Secure Payment</h6>
+                                    <small class="text-muted">Your data is protected</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <i class="fas fa-undo text-warning me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Easy Cancellation</h6>
+                                    <small class="text-muted">Free cancellation up to 48 hours</small>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <i class="fas fa-headset text-danger me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">24/7 Support</h6>
+                                    <small class="text-muted">We're here to help you</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="card shadow border-0 mt-4">
+                        <div class="card-body text-center">
+                            <h6>Need Help?</h6>
+                            <p class="mb-2">
+                                <i class="fas fa-phone me-2 text-primary"></i>
+                                <a href="tel:+250791010558" class="text-decoration-none">+250 791 010 558</a>
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-envelope me-2 text-primary"></i>
+                                <a href="mailto:tuyambazesylvain5@gmail.com" class="text-decoration-none">Email Us</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.room-option {
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.room-option:hover, .room-option.selected {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.1);
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 50px;
+    padding: 12px 40px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    
+    // Set min dates
+    document.getElementById('check_in').min = today;
+    document.getElementById('check_out').min = tomorrowStr;
+    
+    // Room selection
+    const roomOptions = document.querySelectorAll('.room-option');
+    let selectedRoomPrice = document.querySelector('.room-option').dataset.roomPrice;
+    
+    roomOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            roomOptions.forEach(opt => {
+                opt.classList.remove('selected', 'border-primary');
+                opt.querySelector('.form-check-input').checked = false;
+            });
+            
+            // Add selected class to clicked option
+            this.classList.add('selected', 'border-primary');
+            this.querySelector('.form-check-input').checked = true;
+            selectedRoomPrice = this.dataset.roomPrice;
+            
+            calculateTotal();
+        });
+    });
+
+    // Date change handlers
+    document.getElementById('check_in').addEventListener('change', calculateTotal);
+    document.getElementById('check_out').addEventListener('change', calculateTotal);
+    document.getElementById('guests').addEventListener('change', calculateTotal);
+
+    function calculateTotal() {
+        const checkIn = new Date(document.getElementById('check_in').value);
+        const checkOut = new Date(document.getElementById('check_out').value);
+        
+        if (checkIn && checkOut && checkIn < checkOut) {
+            const timeDiff = checkOut.getTime() - checkIn.getTime();
+            const nightCount = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            const monthCount = Math.ceil(nightCount / 30); // Approximate months
+            
+            const totalCost = selectedRoomPrice * monthCount;
+            
+            // Update displays
+            document.getElementById('totalNights').textContent = `${nightCount} nights (${monthCount} months)`;
+            document.getElementById('totalCost').textContent = `${totalCost.toLocaleString()} RWF`;
+            
+            document.getElementById('summaryPrice').textContent = `${selectedRoomPrice.toLocaleString()} RWF/month`;
+            document.getElementById('summaryNights').textContent = `${monthCount} months`;
+            document.getElementById('summaryTotal').textContent = `${totalCost.toLocaleString()} RWF`;
+        } else {
+            // Reset displays
+            document.getElementById('totalNights').textContent = '0 nights';
+            document.getElementById('totalCost').textContent = '0 RWF';
+            document.getElementById('summaryPrice').textContent = '0 RWF/month';
+            document.getElementById('summaryNights').textContent = '0 months';
+            document.getElementById('summaryTotal').textContent = '0 RWF';
+        }
+    }
+
+    // Phone number formatting
+    document.getElementById('phone').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.startsWith('250')) {
+            value = '+' + value;
+        } else if (value.length > 0) {
+            value = '+250' + value;
+        }
+        e.target.value = value;
+    });
+
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Scroll to first invalid field
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalid.focus();
+            }
+        }
+        form.classList.add('was-validated');
+    }, false);
+
+    // Initial calculation
+    calculateTotal();
+});
+</script>
+{% endblock %}

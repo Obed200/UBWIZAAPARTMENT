@@ -1,0 +1,590 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block content %}
+
+<!-- Full Screen Hero Section with YouTube Background -->
+<section class="hero">
+  <!-- YouTube Background Video -->
+  <div class="hero-background">
+    {% for apartment in apartments %}
+      {% if apartment.has_video and forloop.first %}
+      <div class="youtube-hero-bg">
+        <iframe 
+          src="https://www.youtube.com/embed/{{ apartment.get_youtube_id }}?autoplay=1&mute=1&loop=1&playlist={{ apartment.get_youtube_id }}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&background=1" 
+          frameborder="0" 
+          allow="autoplay; encrypted-media" 
+          allowfullscreen
+          title="UBWIZA Apartment Video Tour">
+        </iframe>
+      </div>
+      {% endif %}
+    {% empty %}
+      <!-- Fallback if no YouTube video -->
+      <div class="fallback-hero-bg"></div>
+    {% endfor %}
+  </div>
+  
+  <!-- Text Overlay -->
+  <div class="hero-overlay">
+    <h1 class="hero-title">Welcome to UBWIZA APARTMENT</h1>
+    <p class="hero-subtitle">Your cozy stay in the heart of Kanombe</p>
+    <a class="btn btn-primary btn-hero" href="{% url 'booking' %}">Book a Room</a>
+  </div>
+</section>
+
+<!-- Available Rooms Section -->
+<section id="rooms" class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5 section-title">Available Rooms</h2>
+    <div class="row">
+      {% for room in featured_rooms %}
+      <div class="col-xl-4 col-md-6 mb-4 room-item {% if forloop.counter > 3 %}extra-room{% endif %}">
+        <div class="card room-card h-100 shadow-sm">
+          <img src="{{ room.image.url }}" class="card-img-top room-image" alt="{{ room.title }}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ room.title }}</h5>
+            <p class="card-text flex-grow-1">{{ room.description|truncatewords:20 }}</p>
+            <div class="mt-auto">
+              <p class="card-text">
+                <span class="badge bg-primary">{{ room.room_type|title }}</span>
+              </p>
+              <p class="card-text fw-bold text-success">{{ room.price }} RWF/Night</p>
+              <a href="{% url 'booking' %}" class="btn btn-outline-primary btn-sm">Book Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center">
+        <p class="text-muted">No featured rooms available at the moment.</p>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% if featured_rooms|length > 3 %}
+    <div class="text-center mt-4">
+      <button id="showMoreRooms" class="btn btn-outline-primary btn-lg">
+        Show More Rooms <i class="fas fa-chevron-down ms-2"></i>
+      </button>
+      <button id="showLessRooms" class="btn btn-outline-secondary btn-lg" style="display: none;">
+        Show Less <i class="fas fa-chevron-up ms-2"></i>
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Auto-Scrolling Gallery Preview -->
+<section id="gallery-preview" class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-5 section-title">Gallery</h2>
+    
+    {% if gallery_images %}
+    <!-- Auto-scrolling gallery -->
+    <div class="gallery-scroll-container">
+      <div class="gallery-scroll-track">
+        {% for image in gallery_images %}
+        <div class="gallery-scroll-item">
+          <img src="{{ image.image.url }}" alt="{{ image.title }}" class="scroll-image">
+          <div class="scroll-image-overlay">
+            <span class="scroll-image-title">{{ image.title }}</span>
+          </div>
+        </div>
+        {% endfor %}
+        <!-- Duplicate items for seamless loop -->
+        {% for image in gallery_images %}
+        <div class="gallery-scroll-item">
+          <img src="{{ image.image.url }}" alt="{{ image.title }}" class="scroll-image">
+          <div class="scroll-image-overlay">
+            <span class="scroll-image-title">{{ image.title }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'gallery' %}" class="btn btn-primary btn-lg">View Full Gallery</a>
+    </div>
+    
+    {% else %}
+    <div class="text-center">
+      <p class="text-muted">No gallery images available yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Apartments Section -->
+{% if apartments %}
+<section id="apartments" class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5 section-title">Our Apartments</h2>
+    <div class="row">
+      {% for apartment in apartments %}
+      <div class="col-lg-6 mb-4 apartment-item {% if forloop.counter > 2 %}extra-apartment{% endif %}">
+        <div class="card apartment-card h-100 shadow">
+           <img src="{{ apartment.photo.url }}" class="card-img-top apartment-image" alt="{{ apartment.name }}">
+          <div class="card-body"> 
+            <h5 class="card-title">{{ apartment.name }}</h5>
+            <p class="card-text apartment-description">{{ apartment.description|truncatewords:30 }}</p>
+            {% if apartment.has_video %}
+            <div class="mt-3">
+              <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" 
+                        src="https://www.youtube.com/embed/{{ apartment.get_youtube_id }}" 
+                        allowfullscreen
+                        style="border-radius: 8px;"
+                        title="{{ apartment.name }} Video Tour">
+                </iframe>
+              </div>
+              <small class="text-muted d-block mt-1">
+                <i class="fas fa-video text-danger"></i> Video tour available
+              </small>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% if apartments|length > 2 %}
+    <div class="text-center mt-4">
+      <button id="showMoreApartments" class="btn btn-outline-primary btn-lg">
+        Show More Apartments <i class="fas fa-chevron-down ms-2"></i>
+      </button>
+      <button id="showLessApartments" class="btn btn-outline-secondary btn-lg" style="display: none;">
+        Show Less <i class="fas fa-chevron-up ms-2"></i>
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<style>
+/* Full Screen Hero Styles */
+.hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* YouTube Background Video */
+.youtube-hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.youtube-hero-bg iframe {
+  width: 100vw;
+  height: 56.25vw; /* 16:9 aspect ratio */
+  min-height: 100vh;
+  min-width: 177.77vh; /* 16:9 aspect ratio */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; /* Prevent interaction with background iframe */
+}
+
+/* Fallback background if no YouTube video */
+.fallback-hero-bg {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+  width: 90%;
+  max-width: 800px;
+  z-index: 10; /* Ensure text is above video */
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: bold;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.btn-hero {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  padding: 12px 40px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-hero:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 300;
+  color: #2c3e50;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(135deg, #3498db, #2c3e50);
+  border-radius: 2px;
+}
+
+/* Show More/Less Functionality */
+.extra-room, .extra-apartment {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+.extra-room.show, .extra-apartment.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Auto-scrolling Gallery Styles */
+.gallery-scroll-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+}
+
+.gallery-scroll-track {
+  display: flex;
+  animation: scroll 30s linear infinite;
+  gap: 15px;
+}
+
+.gallery-scroll-item {
+  flex: 0 0 auto;
+  width: 300px;
+  height: 200px;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.gallery-scroll-item:hover {
+  transform: scale(1.05);
+}
+
+.scroll-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scroll-image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: white;
+  padding: 10px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.gallery-scroll-item:hover .scroll-image-overlay {
+  transform: translateY(0);
+}
+
+.scroll-image-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-300px * {{ gallery_images.count }} - 15px * {{ gallery_images.count }}));
+  }
+}
+
+/* Pause animation on hover */
+.gallery-scroll-container:hover .gallery-scroll-track {
+  animation-play-state: paused;
+}
+
+/* Card Hover Effects */
+.room-card, .apartment-card {
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.room-card:hover, .apartment-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+.room-image, .apartment-image {
+  transition: transform 0.3s ease;
+}
+
+.room-card:hover .room-image,
+.apartment-card:hover .apartment-image {
+  transform: scale(1.05);
+}
+
+/* Responsive YouTube embeds */
+.embed-responsive {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.embed-responsive::before {
+  content: "";
+  display: block;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+}
+
+.embed-responsive-item {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Show More/Less Button Styles */
+.btn-toggle {
+  font-size: 1.1rem;
+  padding: 12px 30px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  border: 2px solid;
+}
+
+.btn-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero {
+    height: 70vh;
+  }
+  
+  .hero-overlay {
+    width: 95%;
+  }
+  
+  .gallery-scroll-item {
+    width: 250px;
+    height: 160px;
+  }
+  
+  .btn-toggle {
+    padding: 10px 25px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero {
+    height: 60vh;
+  }
+  
+  .gallery-scroll-item {
+    width: 200px;
+    height: 140px;
+  }
+  
+  .btn-hero {
+    padding: 10px 30px;
+  }
+}
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Loading animation for images */
+.gallery-scroll-item img,
+.room-image,
+.apartment-image {
+  background: linear-gradient(90deg, #f0f0f0 25%, transparent 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* Remove loading animation when image is loaded */
+.gallery-scroll-item img.loaded,
+.room-image.loaded,
+.apartment-image.loaded {
+  background: none;
+  animation: none;
+}
+
+/* Smooth transitions for show more/less */
+.room-item, .apartment-item {
+  transition: all 0.5s ease;
+}
+</style>
+
+<script>
+// Add loaded class to images when they're fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  const images = document.querySelectorAll('img');
+  images.forEach(img => {
+    if (img.complete) {
+      img.classList.add('loaded');
+    } else {
+      img.addEventListener('load', function() {
+        this.classList.add('loaded');
+      });
+    }
+  });
+
+  // Show More/Less functionality for Rooms
+  const showMoreRoomsBtn = document.getElementById('showMoreRooms');
+  const showLessRoomsBtn = document.getElementById('showLessRooms');
+  const extraRooms = document.querySelectorAll('.extra-room');
+
+  if (showMoreRoomsBtn) {
+    showMoreRoomsBtn.addEventListener('click', function() {
+      extraRooms.forEach(room => {
+        room.classList.add('show');
+      });
+      showMoreRoomsBtn.style.display = 'none';
+      showLessRoomsBtn.style.display = 'inline-block';
+      
+      // Smooth scroll to rooms section
+      document.getElementById('rooms').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  }
+
+  if (showLessRoomsBtn) {
+    showLessRoomsBtn.addEventListener('click', function() {
+      extraRooms.forEach(room => {
+        room.classList.remove('show');
+      });
+      showMoreRoomsBtn.style.display = 'inline-block';
+      showLessRoomsBtn.style.display = 'none';
+      
+      // Smooth scroll to rooms section
+      document.getElementById('rooms').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  }
+
+  // Show More/Less functionality for Apartments
+  const showMoreApartmentsBtn = document.getElementById('showMoreApartments');
+  const showLessApartmentsBtn = document.getElementById('showLessApartments');
+  const extraApartments = document.querySelectorAll('.extra-apartment');
+
+  if (showMoreApartmentsBtn) {
+    showMoreApartmentsBtn.addEventListener('click', function() {
+      extraApartments.forEach(apartment => {
+        apartment.classList.add('show');
+      });
+      showMoreApartmentsBtn.style.display = 'none';
+      showLessApartmentsBtn.style.display = 'inline-block';
+      
+      // Smooth scroll to apartments section
+      document.getElementById('apartments').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  }
+
+  if (showLessApartmentsBtn) {
+    showLessApartmentsBtn.addEventListener('click', function() {
+      extraApartments.forEach(apartment => {
+        apartment.classList.remove('show');
+      });
+      showMoreApartmentsBtn.style.display = 'inline-block';
+      showLessApartmentsBtn.style.display = 'none';
+      
+      // Smooth scroll to apartments section
+      document.getElementById('apartments').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  }
+});
+</script>
+
+{% endblock %}

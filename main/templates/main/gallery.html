@@ -1,0 +1,147 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+    <!-- Gallery Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Our Gallery</h1>
+        <p class="lead">Discover the beauty and comfort of UBWIZA Apartment</p>
+    </div>
+
+    <!-- Gallery Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-filter="all">All</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="rooms">Rooms</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="apartments">Apartments</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="amenities">Amenities</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="row" id="galleryGrid">
+        {% for image in photos %}
+        <div class="col-lg-4 col-md-6 mb-4 gallery-item" data-category="rooms">
+            <div class="card gallery-card h-100 shadow-sm">
+                <img src="{{ image.image.url }}" class="card-img-top gallery-image" 
+                     alt="{{ image.title }}" style="height: 250px; object-fit: cover;">
+                <div class="card-body">
+                    <h6 class="card-title">{{ image.title }}</h6>
+                    <button class="btn btn-sm btn-outline-primary view-image" 
+                            data-image="{{ image.image.url }}" 
+                            data-title="{{ image.title }}">
+                        <i class="fas fa-expand me-1"></i> View Larger
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                <i class="fas fa-images fa-2x mb-3"></i>
+                <h4>No Photos Available Yet</h4>
+                <p>We're working on adding more photos of our beautiful property.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle">Image Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" alt="" class="img-fluid" id="modalImage">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.gallery-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.gallery-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.gallery-image {
+    transition: transform 0.3s ease;
+}
+
+.gallery-card:hover .gallery-image {
+    transform: scale(1.05);
+}
+
+.btn-group .btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.gallery-item {
+    display: block;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter items
+            galleryItems.forEach(item => {
+                if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Image modal functionality
+    const viewButtons = document.querySelectorAll('.view-image');
+    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('imageModalTitle');
+    
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const imageUrl = this.getAttribute('data-image');
+            const imageTitle = this.getAttribute('data-title');
+            
+            modalImage.src = imageUrl;
+            modalImage.alt = imageTitle;
+            modalTitle.textContent = imageTitle;
+            
+            imageModal.show();
+        });
+    });
+});
+</script>
+{% endblock %}
